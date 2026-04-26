@@ -1,6 +1,9 @@
 import json
 from typing import Dict, Any, List
-from .planner import PlanningStrategy
+try:
+    from .planner import PlanningStrategy
+except ImportError:
+    from planner import PlanningStrategy
 
 class ContextManager:
     def __init__(self):

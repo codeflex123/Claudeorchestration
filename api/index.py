@@ -7,10 +7,16 @@ import os
 # Load environment variables (Phase 1-5 connectivity fix)
 load_dotenv()
 
-from .classifier import Classifier, ClassificationResult
-from .planner import Planner, PlanningStrategy
-from .utils import InputAnalyzer
-from .context_manager import context_manager
+try:
+    from .classifier import Classifier, ClassificationResult
+    from .planner import Planner, PlanningStrategy
+    from .utils import InputAnalyzer
+    from .context_manager import context_manager
+except ImportError:
+    from classifier import Classifier, ClassificationResult
+    from planner import Planner, PlanningStrategy
+    from utils import InputAnalyzer
+    from context_manager import context_manager
 
 app = FastAPI()
 classifier = Classifier()
@@ -39,6 +45,7 @@ def health_check():
     return {"status": "ok"}
 
 @app.post("/api/triage")
+@app.post("/triage")
 async def triage_prompt(request: TriageRequest):
     # Standardize input
     analyzer = InputAnalyzer(request.prompt)
@@ -68,6 +75,7 @@ async def triage_prompt(request: TriageRequest):
     )
 
 @app.post("/api/handoff")
+@app.post("/handoff")
 async def perform_handoff(request: HandoffRequest):
     """
     Finalizes the triage session and returns the handoff bundle.

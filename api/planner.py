@@ -5,8 +5,12 @@ from typing import List, Literal, Optional
 from anthropic import AsyncAnthropic
 from groq import AsyncGroq
 import google.generativeai as genai
-from .classifier import Provider
-from .mcp import mcp_registry, MCPTool
+try:
+    from .classifier import Provider
+    from .mcp import mcp_registry, MCPTool
+except ImportError:
+    from classifier import Provider
+    from mcp import mcp_registry, MCPTool
 
 class TaskStep(BaseModel):
     title: str
