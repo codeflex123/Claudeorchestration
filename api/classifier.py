@@ -29,7 +29,7 @@ class Classifier:
             return Provider.GEMINI
         if os.getenv("ANTHROPIC_API_KEY"):
             return Provider.ANTHROPIC
-        raise ValueError("No API key found for Anthropic, Groq, or Gemini.")
+        raise ValueError("Missing API Configuration. Please ensure GROQ_API_KEY is set in your environment variables.")
 
     def _init_client(self):
         if self.provider == Provider.ANTHROPIC:

@@ -422,6 +422,7 @@ export default function Home() {
   const [handoffResult, setHandoffResult] = useState<any>(null);
   const [isHandingOff, setIsHandingOff] = useState(false);
   const [view, setView] = useState<'triage' | 'handoff'>('triage');
+  const [error, setError] = useState<string | null>(null);
 
   const handleTriage = async () => {
     if (!prompt.trim()) return;
@@ -436,10 +437,18 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Failed to contact the orchestration engine.");
+      }
+
       const data = await res.json();
       setResult(data);
-    } catch (error) {
-      console.error("Triage failed:", error);
+      setError(null);
+    } catch (err: any) {
+      console.error("Triage failed:", err);
+      setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
@@ -458,10 +467,17 @@ export default function Home() {
           strategy: result.strategy 
         }),
       });
+      
+      if (!res.ok) {
+        throw new Error("Failed to establishment handoff context.");
+      }
+
       const data = await res.json();
       setHandoffResult(data.handoff_bundle);
-    } catch (error) {
-      console.error("Handoff failed:", error);
+      setError(null);
+    } catch (err: any) {
+      console.error("Handoff failed:", err);
+      setError(err.message || "Handoff connection lost.");
     } finally {
       setIsHandingOff(false);
     }
@@ -474,6 +490,7 @@ export default function Home() {
     setHandoffResult(null);
     setIsHandingOff(false);
     setView('triage');
+    setError(null);
   };
 
   // The main layout now always includes the Sidebar for AI and Cowork views.
@@ -548,6 +565,17 @@ export default function Home() {
                         </div>
                      </div>
                   </div>
+
+                  {error && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="w-full max-w-xl p-4 px-6 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4 text-red-400 text-sm font-medium"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                      {error}
+                    </motion.div>
+                  )}
 
                   <div className="flex flex-wrap justify-center gap-2.5 opacity-60">
                     <Tag icon={<CodeIcon size={12}/>} name="Code" />
