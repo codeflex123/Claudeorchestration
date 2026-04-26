@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 2, 2, 8;
+  --background: #111111;
+  --foreground: #d1d1d1;
+  --sidebar: #0d0d0d;
+  --border: #222222;
+  --accent: #d97757; /* Claude Pink/Tan */
+  --accent-blue: #3b82f6;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.sidebar {
+  background-color: var(--sidebar);
+  border-right: 1px solid var(--border);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+}
+
+.glass-active {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--accent-blue);
+}
+
+.text-gradient {
+  color: var(--accent);
+}
+
+pre, code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
