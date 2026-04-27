@@ -17,6 +17,28 @@ The interface is a pixel-perfect replication of the native Claude.ai design syst
 - **New Chat Logic**: Fully functional sidebar button to reset the orchestration session seamlessly.
 - **Context Preservation**: Intelligent handover of prompt metadata between environments.
 
+## 🔄 System Workflow
+```mermaid
+graph TD
+    User([User Prompt]) --> Orchestrator{Orchestration Layer}
+    Orchestrator --> Classifier[Intent Classifier]
+    
+    Classifier -- Simple --> BranchA[Branch A: Direct Response]
+    Classifier -- Complex --> BranchB[Branch B: Triage Mode]
+    
+    subgraph "Branch B: Triage Dashboard"
+        BranchB --> Planner[Planning Engine]
+        Planner --> DashboardUI[Triage UI Dashboard]
+        DashboardUI --> Plan[To-Do List / Execution Plan]
+        DashboardUI --> Specs[ETA & Model Preferences]
+        DashboardUI --> MCP[MCP Connector Toggles]
+    end
+    
+    DashboardUI --> Proceed{Proceed Button}
+    Proceed -- Clicked --> Transfer[Context Handover]
+    Transfer --> Env[Target Environment: Cowork / Code]
+```
+
 ## 🔄 User Data Flow
 ```mermaid
 sequenceDiagram
