@@ -59,14 +59,19 @@ class Planner:
         3. Recommended Claude model (Claude 3.5 Sonnet for general engineering/coding, Claude 3 Opus for deep research/reasoning).
         4. Reasoning for the model choice.
         5. Any potential MCP (Model Context Protocol) connectors required. Available examples: github, gmail, google-drive, terminal, browser, slack. Use 'gmail' specifically for email-related tasks.
+        6. Recommended Environment: 
+           - 'Claude AI': For simple direct queries, basic knowledge, or direct Q&A.
+           - 'Claude Cowork': For multi-step research, business strategies, planning, and long-form analysis.
+           - 'Claude Code': ONLY for technical engineering, direct coding, terminal tasks, or file-system operations.
         
         Respond ONLY in JSON format:
         {
             "steps": [{"title": "...", "description": "...", "estimated_minutes": 5}],
             "estimated_total_time_mins": 30,
             "recommended_model": "Claude 3.5 Sonnet",
+            "recommended_environment": "Claude AI | Claude Cowork | Claude Code",
             "reasoning": "...",
-            "mcp_required": ["github", "gmail", "terminal"]
+            "mcp_required": ["gmail", "browser"]
         }
         """
 
@@ -103,13 +108,15 @@ class Planner:
             raw_mcp = data.get("mcp_required", [])
             data["mcp_required"] = mcp_registry.get_tool_metadata(raw_mcp)
 
-            # Step 4: Determine environment (Wireframe Alignment)
-            if "terminal" in raw_mcp or "github" in raw_mcp:
-                data["recommended_environment"] = "Claude Code"
-            elif len(data.get("steps", [])) > 3:
-                data["recommended_environment"] = "Claude Cowork"
-            else:
-                data["recommended_environment"] = "Claude AI"
+            # Note: We now trust the LLM's 'recommended_environment' choice from the JSON
+            # But we add a safety fallback just in case the LLM misses the field
+            if "recommended_environment" not in data:
+                if "terminal" in raw_mcp or "github" in raw_mcp:
+                    data["recommended_environment"] = "Claude Code"
+                elif len(data.get("steps", [])) > 3:
+                    data["recommended_environment"] = "Claude Cowork"
+                else:
+                    data["recommended_environment"] = "Claude AI"
 
             return PlanningStrategy(**data)
         except Exception as e:
