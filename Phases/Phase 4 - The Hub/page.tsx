@@ -285,7 +285,7 @@ const ClaudeCoworkSimulation = ({ bundle, onExit }: any) => (
               <ChevronRight className="w-4 h-4 text-gray-600" />
            </div>
            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-[11px] text-gray-300 font-mono">
-              /User/Project
+              /Users/project
            </div>
         </div>
 
