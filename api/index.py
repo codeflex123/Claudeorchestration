@@ -4,7 +4,7 @@ from typing import Optional
 from dotenv import load_dotenv
 import os
 
-# Load environment variables (Phase 1-5 connectivity fix)
+# Load environment variables
 load_dotenv()
 
 try:
@@ -18,7 +18,8 @@ except ImportError:
     from utils import InputAnalyzer
     from context_manager import context_manager
 
-app = FastAPI()
+app = FastAPI(title="Claude Orchestration Backend")
+
 classifier = Classifier()
 planner = Planner()
 
@@ -30,7 +31,7 @@ class TriageResponse(BaseModel):
     intent: str
     message: str
     classification: ClassificationResult
-    strategy: Optional[PlanningStrategy] = None
+    strategy: PlanningStrategy
 
 class HandoffRequest(BaseModel):
     prompt: str
@@ -41,6 +42,7 @@ def root_health():
     return {"status": "ok", "service": "Claude Orchestration Backend"}
 
 @app.get("/api/health")
+@app.get("/health")
 def health_check():
     return {"status": "ok"}
 
@@ -54,22 +56,21 @@ async def triage_prompt(request: TriageRequest):
     # Classify intent
     classification = await classifier.classify(clean_prompt)
     
-    # Branching logic
-    if classification.confidence > 0.8 and classification.intent == "SIMPLE":
-        return TriageResponse(
-            branch="A",
-            intent="SIMPLE",
-            message="This is a direct query. Responding immediately via Claude AI...",
-            classification=classification
-        )
-    
-    # Complex branch - Generate Strategy
+    # Generate execution plan
     strategy = await planner.generate_plan(clean_prompt)
     
+    # Align strategy environment with classification if applicable
+    if classification.intent == "SIMPLE":
+        branch = "A"
+        message = "Direct inquiry detected. Streamlined plan formulated for Claude AI."
+    else:
+        branch = "B"
+        message = f"Complex task detected. Orchestrating specialized workflow for {strategy.recommended_environment}."
+    
     return TriageResponse(
-        branch="B",
-        intent="COMPLEX",
-        message="Complex task detected. Triage Dashboard initiated for strategic planning.",
+        branch=branch,
+        intent=classification.intent,
+        message=message,
         classification=classification,
         strategy=strategy
     )
@@ -91,5 +92,5 @@ async def catch_all(path_name: str):
     return {
         "error": "Endpoint not found",
         "requested_path": path_name,
-        "detail": "If you are seeing this, the proxy is hitting the backend but the route is not defined in FastAPI with the correct prefix."
+        "detail": "If you are seeing this, verify route definition in FastAPI."
     }

@@ -315,14 +315,14 @@ const ClaudeAIView = ({ bundle, onExit }: any) => (
            <span className="text-[13px] text-gray-400 font-medium truncate max-w-md">{bundle.initial_prompt}</span>
            <ChevronDown size={14} className="text-gray-600" />
         </div>
-        <button className="px-3 py-1.5 bg-white/5 text-[11px] font-bold rounded-lg border border-white/10 text-gray-300 hover:bg-white/10 transition-colors">Share</button>
+        <button onClick={onExit} className="px-3 py-1.5 bg-white/5 text-[11px] font-bold rounded-lg border border-white/10 text-gray-300 hover:bg-white/10 transition-colors uppercase tracking-widest">Exit</button>
      </div>
      
      <div style={{ flex: 1, overflowY: 'auto', padding: '48px 0' }}>
         <div className="max-w-3xl mx-auto w-full space-y-12 px-8">
            {/* User Message */}
            <div className="flex justify-end">
-              <div className="max-w-2xl bg-[#1e1e1e] p-5 px-7 rounded-[2rem] text-[15px] text-white/90 leading-relaxed">
+              <div className="max-w-2xl bg-[#1e1e1e] p-5 px-7 rounded-[2rem] text-[15px] text-white/90 leading-relaxed shadow-lg">
                  {bundle.initial_prompt}
               </div>
            </div>
@@ -330,47 +330,27 @@ const ClaudeAIView = ({ bundle, onExit }: any) => (
            {/* AI Response */}
            <div className="space-y-6">
               <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
-                 <span>Searched the web</span>
+                 <span>Claude AI Synthesis</span>
                  <ChevronRight size={12} />
               </div>
 
               <div className="text-[16px] text-white/90 font-medium leading-relaxed uppercase tracking-tight">
-                 Analyzing your request: "{bundle.initial_prompt.substring(0, 60)}..."
+                 Synthesized Response for: "{bundle.initial_prompt.substring(0, 60)}..."
               </div>
 
-              {/* Artifact Card: Email Summary */}
+              {/* Artifact Card: Dynamic Output */}
               <div className="bg-[#181818] border border-white/10 rounded-2xl overflow-hidden shadow-xl max-w-2xl">
                  <div className="p-6 space-y-6">
                     <div className="flex items-center gap-3 text-[13px] text-gray-400">
-                       <span className="font-bold">Subject:</span>
+                       <span className="font-bold">Output:</span>
                        <span className="flex items-center gap-2">
                           <Globe size={14} className="text-blue-400" />
-                          Summary: Optimized Strategy for "{bundle.initial_prompt.substring(0, 40)}..."
+                          Direct Execution for "{bundle.initial_prompt.substring(0, 45)}..."
                        </span>
                     </div>
 
-                    <div className="pt-4 border-t border-white/5 space-y-4 text-[14px] text-gray-300 leading-relaxed">
-                       <p>Hi,</p>
-                       <p>Here is a concise summary of the research findings regarding your request:</p>
-                       
-                       <div className="space-y-4 pt-2">
-                          <div className="flex items-center gap-3 text-blue-400 font-bold uppercase tracking-wider text-[11px]">
-                             <Layout size={14} />
-                             LANDMARK CHANGE: NEW INCOME TAX ACT 2025
-                          </div>
-                          <p className="pl-7">The Income Tax Act, 2025 (replacing the 60-year-old Income Tax Act, 1961) has come into force from 1st April 2026. The new Act simplifies taxation language and compliance.</p>
-                       </div>
-
-                       <div className="space-y-4 pt-2">
-                          <div className="flex items-center gap-3 text-[#d97757] font-bold uppercase tracking-wider text-[11px]">
-                             <Box size={14} />
-                             PERSONAL INCOME TAX CHANGES (FY 2025-26)
-                          </div>
-                          <ul className="pl-7 list-disc space-y-1">
-                             <li>Basic Exemption Limit raised from ₹3 lakh → ₹4 lakh (New Tax Regime)</li>
-                             <li>Section 87A Rebate increased from ₹25,000 → ₹60,000</li>
-                          </ul>
-                       </div>
+                    <div className="pt-4 border-t border-white/5 space-y-4 text-[14px] text-gray-300 leading-relaxed whitespace-pre-wrap font-sans">
+                       {bundle.system_directive || "Standard prompt execution complete. Environment is ready for interaction."}
                     </div>
                  </div>
 
@@ -378,16 +358,18 @@ const ClaudeAIView = ({ bundle, onExit }: any) => (
                     <div className="p-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors text-gray-500 hover:text-white">
                        <Layout size={16} />
                     </div>
-                    <button className="flex items-center gap-2 py-1.5 px-4 bg-white/5 border border-white/10 rounded-xl text-[11px] font-bold text-gray-400 hover:bg-white/10 hover:text-white transition-all">
-                       <Globe size={14} className="text-blue-400" />
-                       Send via Gmail
-                       <ChevronDown size={14} />
-                    </button>
+                    {bundle.metadata?.mcp_context?.some((m: any) => m.id === 'gmail') && (
+                      <button className="flex items-center gap-2 py-1.5 px-4 bg-white/5 border border-white/10 rounded-xl text-[11px] font-bold text-gray-400 hover:bg-white/10 hover:text-white transition-all">
+                         <Globe size={14} className="text-blue-400" />
+                         Send via Gmail
+                         <ChevronDown size={14} />
+                      </button>
+                    )}
                  </div>
               </div>
 
               <div className="text-[15px] text-gray-400 font-medium">
-                 Here's a quick overview of what the research found, along with the email ready to send:
+                 Ready to continue the conversation in Claude AI chat.
               </div>
            </div>
         </div>
@@ -396,7 +378,7 @@ const ClaudeAIView = ({ bundle, onExit }: any) => (
      <div style={{ padding: '24px 32px 48px' }}>
         <div className="max-w-3xl mx-auto bg-[#1e1e1e] border border-white/5 p-4 px-6 rounded-[2.5rem] flex items-center gap-4 shadow-2xl relative">
            <Plus className="w-5 h-5 text-gray-500 hover:text-white cursor-pointer" />
-           <div className="flex-1 text-gray-500 text-sm">Reply...</div>
+           <div className="flex-1 text-gray-500 text-sm">Reply in Claude AI...</div>
            <div className="flex items-center gap-4 text-gray-600">
               <div className="flex items-center gap-2 text-[11px] font-bold hover:bg-white/5 px-2 py-1 rounded cursor-pointer">
                  <span>Sonnet 4.7</span>
@@ -615,12 +597,19 @@ export default function Home() {
                       <div className="p-10 md:p-14 space-y-12 bg-gradient-to-b from-[#181818] to-[#121212]">
                          <div className="space-y-6 text-center border-b border-white/5 pb-14">
                             <h2 className="text-4xl font-serif text-white/90 tracking-tight italic leading-snug max-w-2xl mx-auto">
-                               {result.intent === 'COMPLEX' ? "This request warrants a multi-agent orchestration strategy." : "This is a standard direct response task."}
+                               {result.intent === 'COMPLEX' 
+                                 ? `This request warrants a multi-agent orchestration strategy via ${result.strategy?.recommended_environment || 'Claude'}.` 
+                                 : "This is a standard direct response task for Claude AI."}
                             </h2>
-                            <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/5 rounded-full text-[11px] text-gray-500 tracking-wider uppercase font-bold border border-white/5">
-                               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                               {result.intent} Severity • {result.classification.confidence * 100}% Confidence
+                            <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/5 rounded-full text-[11px] text-gray-400 tracking-wider uppercase font-bold border border-white/5">
+                               <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${result.strategy?.recommended_environment === 'Claude Code' ? 'bg-amber-400' : result.strategy?.recommended_environment === 'Claude Cowork' ? 'bg-blue-400' : 'bg-emerald-400'}`}></span>
+                               {result.intent} Severity • {Math.round((result.classification.confidence || 0.9) * 100)}% Confidence
                             </div>
+                            {result.strategy?.reasoning && (
+                              <div className="mt-3 text-[13px] text-gray-400 max-w-xl mx-auto italic opacity-75">
+                                 "{result.strategy.reasoning}"
+                              </div>
+                            )}
                          </div>
 
                          {result.strategy && (
